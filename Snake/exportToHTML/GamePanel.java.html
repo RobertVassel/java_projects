@@ -1,0 +1,215 @@
+<html>
+<head>
+<title>GamePanel.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6897bb;}
+.s3 { color: #6a8759;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+GamePanel.java</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">javax.swing.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.event.ActionEvent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.event.ActionListener</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.event.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.event.KeyAdapter</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.event.KeyEvent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">javax.swing.Timer</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">javax.swing.Timer</span><span class="s0">;</span>
+
+<span class="s0">public class </span><span class="s1">GamePanel </span><span class="s0">extends </span><span class="s1">JPanel </span><span class="s0">implements </span><span class="s1">ActionListener {</span>
+
+    <span class="s0">static final int </span><span class="s1">SCREEN_WIDTH = </span><span class="s2">600</span><span class="s0">;</span>
+    <span class="s0">static final int </span><span class="s1">SCREEN_HEIGHT = </span><span class="s2">600</span><span class="s0">;</span>
+    <span class="s0">static final int </span><span class="s1">UNIT_SIZE = </span><span class="s2">25</span><span class="s0">;</span>
+    <span class="s0">static final int </span><span class="s1">GAME_UNITS = (SCREEN_WIDTH*SCREEN_HEIGHT)/UNIT_SIZE</span><span class="s0">;</span>
+    <span class="s0">static final int </span><span class="s1">delay = </span><span class="s2">75</span><span class="s0">;</span>
+
+    <span class="s0">final int </span><span class="s1">x[] = </span><span class="s0">new int</span><span class="s1">[GAME_UNITS]</span><span class="s0">;</span>
+    <span class="s0">final int </span><span class="s1">y[] = </span><span class="s0">new int</span><span class="s1">[GAME_UNITS]</span><span class="s0">;</span>
+
+    <span class="s0">int </span><span class="s1">bodyParts = </span><span class="s2">6</span><span class="s0">;</span>
+    <span class="s0">int </span><span class="s1">applesEaten</span><span class="s0">;</span>
+    <span class="s0">int </span><span class="s1">appleX</span><span class="s0">;</span>
+    <span class="s0">int </span><span class="s1">appleY</span><span class="s0">;</span>
+    <span class="s0">char </span><span class="s1">direction = </span><span class="s3">'R'</span><span class="s0">;</span>
+    <span class="s0">boolean </span><span class="s1">running = </span><span class="s0">false;</span>
+    <span class="s1">Timer timer</span><span class="s0">;</span>
+    <span class="s1">Random random</span><span class="s0">;</span>
+
+    <span class="s1">GamePanel () {</span>
+        <span class="s1">random = </span><span class="s0">new </span><span class="s1">Random()</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.setPreferredSize(</span><span class="s0">new </span><span class="s1">Dimension(SCREEN_WIDTH</span><span class="s0">,</span><span class="s1">SCREEN_HEIGHT))</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.setBackground(Color.BLACK)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.setFocusable(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.addKeyListener(</span><span class="s0">new </span><span class="s1">MyKeyAdapter())</span><span class="s0">;</span>
+        <span class="s1">startGame()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">startGame() {</span>
+        <span class="s1">newApple()</span><span class="s0">;</span>
+        <span class="s1">running = </span><span class="s0">true;</span>
+        <span class="s1">timer = </span><span class="s0">new </span><span class="s1">Timer(delay</span><span class="s0">,this</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">timer.start()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">paintComponent(Graphics g){</span>
+        <span class="s0">super</span><span class="s1">.paintComponent(g)</span><span class="s0">;</span>
+        <span class="s1">draw(g)</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">draw(Graphics g) {</span>
+
+
+        <span class="s0">if</span><span class="s1">(running) {</span>
+            <span class="s4">// draw the grid onto the frame // based on unit size for a sqare</span>
+            <span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s2">0</span><span class="s0">; </span><span class="s1">i &lt; SCREEN_HEIGHT / UNIT_SIZE</span><span class="s0">; </span><span class="s1">i++) {</span>
+                <span class="s1">g.drawLine(i * UNIT_SIZE</span><span class="s0">, </span><span class="s2">0</span><span class="s0">, </span><span class="s1">i * UNIT_SIZE</span><span class="s0">, </span><span class="s1">SCREEN_HEIGHT)</span><span class="s0">;</span>
+                <span class="s1">g.drawLine(</span><span class="s2">0</span><span class="s0">, </span><span class="s1">i * UNIT_SIZE</span><span class="s0">, </span><span class="s1">SCREEN_WIDTH</span><span class="s0">, </span><span class="s1">i * UNIT_SIZE)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+            <span class="s1">g.setColor(Color.red)</span><span class="s0">;</span>
+            <span class="s1">g.fillOval(appleX</span><span class="s0">, </span><span class="s1">appleY</span><span class="s0">, </span><span class="s1">UNIT_SIZE</span><span class="s0">, </span><span class="s1">UNIT_SIZE)</span><span class="s0">;</span>
+
+            <span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s2">0</span><span class="s0">; </span><span class="s1">i &lt; bodyParts</span><span class="s0">; </span><span class="s1">i++) {</span>
+                <span class="s0">if </span><span class="s1">(i == </span><span class="s2">0</span><span class="s1">) {</span>
+                    <span class="s1">g.setColor(Color.green)</span><span class="s0">;</span>
+                    <span class="s1">g.fillRect(x[i]</span><span class="s0">, </span><span class="s1">y[i]</span><span class="s0">, </span><span class="s1">UNIT_SIZE</span><span class="s0">, </span><span class="s1">UNIT_SIZE)</span><span class="s0">;</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                    <span class="s1">g.setColor(</span><span class="s0">new </span><span class="s1">Color(</span><span class="s2">45</span><span class="s0">, </span><span class="s2">180</span><span class="s0">, </span><span class="s2">0</span><span class="s1">))</span><span class="s0">;</span>
+                    <span class="s1">g.fillRect(x[i]</span><span class="s0">, </span><span class="s1">y[i]</span><span class="s0">, </span><span class="s1">UNIT_SIZE</span><span class="s0">, </span><span class="s1">UNIT_SIZE)</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s1">g.setColor(Color.RED)</span><span class="s0">;</span>
+            <span class="s1">g.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;Ink Free&quot;</span><span class="s0">, </span><span class="s1">Font.BOLD</span><span class="s0">,</span><span class="s2">40</span><span class="s1">))</span><span class="s0">;</span>
+            <span class="s1">FontMetrics metrics = getFontMetrics(g.getFont())</span><span class="s0">;</span>
+            <span class="s1">g.drawString(</span><span class="s3">&quot;Score: &quot; </span><span class="s1">+ applesEaten</span><span class="s0">,</span><span class="s1">(SCREEN_WIDTH - metrics.stringWidth(</span><span class="s3">&quot;Score: &quot; </span><span class="s1">+ applesEaten))/</span><span class="s2">2</span><span class="s0">, </span><span class="s1">g.getFont().getSize() )</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">else </span><span class="s1">{</span>
+            <span class="s1">gameOver(g)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">newApple() {</span>
+        <span class="s1">appleX = random.nextInt((</span><span class="s0">int</span><span class="s1">)(SCREEN_WIDTH/UNIT_SIZE))*UNIT_SIZE</span><span class="s0">;  </span><span class="s4">// random spot on the x axis, range is screen width</span>
+        <span class="s1">appleY = random.nextInt((</span><span class="s0">int</span><span class="s1">)(SCREEN_HEIGHT/UNIT_SIZE))*UNIT_SIZE</span><span class="s0">;  </span><span class="s4">// ...y axis, devide at end because i want to put it evenly into a sqare</span>
+
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">move() {</span>
+        <span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = bodyParts</span><span class="s0">; </span><span class="s1">i &gt; </span><span class="s2">0</span><span class="s0">; </span><span class="s1">i--) {</span>
+        <span class="s1">x[i] = x[i-</span><span class="s2">1</span><span class="s1">]</span><span class="s0">; </span><span class="s4">//(we are shifting the body parts of the snake over by 1)</span>
+        <span class="s1">y[i] = y[i-</span><span class="s2">1</span><span class="s1">]</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">switch </span><span class="s1">(direction) {</span>
+            <span class="s0">case </span><span class="s3">'U' </span><span class="s1">:</span>
+                <span class="s1">y[</span><span class="s2">0</span><span class="s1">] = y[</span><span class="s2">0</span><span class="s1">] - UNIT_SIZE</span><span class="s0">;</span>
+                <span class="s0">break;</span>
+            <span class="s0">case </span><span class="s3">'D' </span><span class="s1">:</span>
+                <span class="s1">y[</span><span class="s2">0</span><span class="s1">] = y[</span><span class="s2">0</span><span class="s1">] + UNIT_SIZE</span><span class="s0">;</span>
+                <span class="s0">break;</span>
+            <span class="s0">case </span><span class="s3">'L' </span><span class="s1">:</span>
+                <span class="s1">x[</span><span class="s2">0</span><span class="s1">] = x[</span><span class="s2">0</span><span class="s1">] - UNIT_SIZE</span><span class="s0">;</span>
+                <span class="s0">break;</span>
+            <span class="s0">case </span><span class="s3">'R' </span><span class="s1">:</span>
+                <span class="s1">x[</span><span class="s2">0</span><span class="s1">] = x[</span><span class="s2">0</span><span class="s1">] + UNIT_SIZE</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">checkApple() {</span>
+        <span class="s0">if</span><span class="s1">((x[</span><span class="s2">0</span><span class="s1">] == appleX) &amp;&amp; y[</span><span class="s2">0</span><span class="s1">] == appleY) {</span>
+            <span class="s1">bodyParts++</span><span class="s0">;</span>
+            <span class="s1">applesEaten++</span><span class="s0">;</span>
+            <span class="s1">newApple()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+    <span class="s1">}</span>
+    <span class="s0">public void </span><span class="s1">checkCollisions() { </span><span class="s4">// check if snake collides with its body parts</span>
+        <span class="s0">for</span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = bodyParts</span><span class="s0">; </span><span class="s1">i&gt;</span><span class="s2">0</span><span class="s0">; </span><span class="s1">i-- ) {</span>
+            <span class="s0">if</span><span class="s1">((x[</span><span class="s2">0</span><span class="s1">] == x[i]) &amp;&amp; (y[</span><span class="s2">0</span><span class="s1">] == y[i])) {</span>
+                <span class="s1">running = </span><span class="s0">false;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s4">// checks if snake head touches left border</span>
+        <span class="s0">if</span><span class="s1">(x[</span><span class="s2">0</span><span class="s1">] &lt; </span><span class="s2">0</span><span class="s1">) {</span>
+            <span class="s1">running = </span><span class="s0">false;</span>
+        <span class="s1">}</span>
+        <span class="s4">// check if head touches right border</span>
+        <span class="s0">if</span><span class="s1">(x[</span><span class="s2">0</span><span class="s1">] &gt; SCREEN_WIDTH) {</span>
+            <span class="s1">running = </span><span class="s0">false;</span>
+        <span class="s1">}</span>
+        <span class="s4">// check if head touches top border</span>
+        <span class="s0">if</span><span class="s1">( y[</span><span class="s2">0</span><span class="s1">] &lt; </span><span class="s2">0</span><span class="s1">) {</span>
+            <span class="s1">running = </span><span class="s0">false;</span>
+        <span class="s1">}</span>
+        <span class="s4">// check if head touches bottom boarder</span>
+        <span class="s0">if</span><span class="s1">( y[</span><span class="s2">0</span><span class="s1">] &gt; SCREEN_HEIGHT) {</span>
+            <span class="s1">running = </span><span class="s0">false;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(!running) {</span>
+            <span class="s1">timer.stop()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">gameOver(Graphics g) {</span>
+        <span class="s4">// game over text</span>
+        <span class="s1">g.setColor(Color.RED)</span><span class="s0">;</span>
+        <span class="s1">g.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;Ink Free&quot;</span><span class="s0">, </span><span class="s1">Font.BOLD</span><span class="s0">,</span><span class="s2">75</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">FontMetrics metrics1 = getFontMetrics(g.getFont())</span><span class="s0">;</span>
+        <span class="s1">g.drawString(</span><span class="s3">&quot;Game Over&quot;</span><span class="s0">,</span><span class="s1">(SCREEN_WIDTH - metrics1.stringWidth(</span><span class="s3">&quot;Game Over&quot;</span><span class="s1">))/</span><span class="s2">2</span><span class="s0">, </span><span class="s1">SCREEN_HEIGHT/</span><span class="s2">2 </span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">g.setColor(Color.RED)</span><span class="s0">;</span>
+        <span class="s1">g.setFont(</span><span class="s0">new </span><span class="s1">Font(</span><span class="s3">&quot;Ink Free&quot;</span><span class="s0">, </span><span class="s1">Font.BOLD</span><span class="s0">,</span><span class="s2">40</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">FontMetrics metrics2 = getFontMetrics(g.getFont())</span><span class="s0">;</span>
+        <span class="s1">g.drawString(</span><span class="s3">&quot;Score: &quot; </span><span class="s1">+ applesEaten</span><span class="s0">,</span><span class="s1">(SCREEN_WIDTH - metrics2.stringWidth(</span><span class="s3">&quot;Score: &quot; </span><span class="s1">+ applesEaten))/</span><span class="s2">2</span><span class="s0">, </span><span class="s1">g.getFont().getSize() )</span><span class="s0">;</span>
+    <span class="s1">}</span>
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">actionPerformed(ActionEvent e) {</span>
+        <span class="s0">if</span><span class="s1">( running) {</span>
+            <span class="s1">move()</span><span class="s0">;</span>
+            <span class="s1">checkApple()</span><span class="s0">;</span>
+            <span class="s1">checkCollisions()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s1">repaint()</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+    <span class="s0">public class </span><span class="s1">MyKeyAdapter </span><span class="s0">extends </span><span class="s1">KeyAdapter {</span>
+        <span class="s1">@Override</span>
+        <span class="s0">public void </span><span class="s1">keyPressed(KeyEvent e) {</span>
+            <span class="s0">switch</span><span class="s1">(e.getKeyCode()) {</span>
+                <span class="s0">case </span><span class="s1">KeyEvent.VK_LEFT:</span>
+                    <span class="s0">if</span><span class="s1">(direction != </span><span class="s3">'R'</span><span class="s1">) {</span>
+                        <span class="s1">direction = </span><span class="s3">'L'</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                    <span class="s0">break;</span>
+                <span class="s0">case </span><span class="s1">KeyEvent.VK_RIGHT:</span>
+                    <span class="s0">if</span><span class="s1">(direction != </span><span class="s3">'L'</span><span class="s1">) {</span>
+                        <span class="s1">direction = </span><span class="s3">'R'</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                    <span class="s0">break;</span>
+                <span class="s0">case </span><span class="s1">KeyEvent.VK_UP:</span>
+                    <span class="s0">if</span><span class="s1">(direction != </span><span class="s3">'D'</span><span class="s1">) {</span>
+                        <span class="s1">direction = </span><span class="s3">'U'</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                    <span class="s0">break;</span>
+                <span class="s0">case </span><span class="s1">KeyEvent.VK_DOWN:</span>
+                    <span class="s0">if</span><span class="s1">(direction != </span><span class="s3">'U'</span><span class="s1">) {</span>
+                        <span class="s1">direction = </span><span class="s3">'D'</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                    <span class="s0">break;</span>
+            <span class="s1">}</span>
+
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>
